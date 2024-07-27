@@ -19,7 +19,6 @@ variables:
   NAME_REPO: java1
   GITLAB_AGENT: uniwinux1/agentr:agentr
   DOCKER_USER: uniwinux
-  GITLAB_URL: gitlab.com/uniwinux1/java1.git
   CHARTVERSION: 1.0.0
   PULLSECRET: pullsecret
   TIMEZONEREGION: America
