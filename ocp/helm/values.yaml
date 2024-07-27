@@ -1,0 +1,25 @@
+# Default values for helm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: "xNAMEx"
+  registry: "xREGISTRYx"
+  user: "xDOCKER_USERx"
+  pullPolicy: Always
+  tag: "xAPPVERSIONx"
+
+imagePullSecrets: xPULLSECRETx
+
+namespace: xNAMESPACEx
+
+service:
+  type: ClusterIP
+  port: xPORTx
+  name: service-port
+  targetport: xPORTx
+  
+route:
+  hostname: "xHOSTNAMEx"   

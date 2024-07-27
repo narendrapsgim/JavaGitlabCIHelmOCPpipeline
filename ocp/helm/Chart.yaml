@@ -1,0 +1,11 @@
+apiVersion: v2
+
+name: xNAMEx
+
+description: Demo for Java Springboot Openshift 
+
+type: application
+
+version: xCHARTVERSIONx
+
+appVersion: "xAPPVERSIONx"

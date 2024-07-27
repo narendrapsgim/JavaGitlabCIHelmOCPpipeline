@@ -1,0 +1,134 @@
+stages:    
+  - build-app
+  - build-docker
+  - deploy
+
+default:
+  tags: ['uni-runner']  
+  artifacts:
+    paths:
+      - build/libs/* 
+      - ocp/* 
+    expire_in: 3h    
+
+variables:
+  NAMESPACE: gitlab-qa
+  BRANCH: main
+  NAMESPACE_RUNNER: gitlab-dev
+  MAIN_GROUP: uniwinux1
+  NAME_REPO: java1
+  GITLAB_AGENT: uniwinux1/agentr:agentr
+  DOCKER_USER: uniwinux
+  GITLAB_URL: gitlab.com/uniwinux1/java1.git
+  CHARTVERSION: 1.0.0
+  PULLSECRET: pullsecret
+  TIMEZONEREGION: America
+  TIMEZONECITY: Toronto
+  REGISTRY: docker.io
+  REPOSITORY: openjdk
+  TAG: 8-jre-alpine
+  PORT: 8080
+  HOSTNAME: jvm-$NAMESPACE.apps-crc.testing
+
+build-app: # build application
+  stage: build-app   
+  image: docker.io/library/gradle:8-jdk11
+  script: 
+    - | # run common scripts
+      . ocp/scripts/sethome.sh
+    - | # build the app  
+      echo "Starting to build project"
+      export JAR_FOLDER=build/libs
+      export JAVA_HOME=/opt/java/openjdk   
+      /usr/bin/gradle build -x test
+      /usr/bin/gradle properties -q >$JAR_FOLDER/p # save the settings    
+    - | # save the parameters
+      export GRADLE_NAME=$(cat $JAR_FOLDER/p | grep "name:" | awk '{print $2}') # get variable from gradle 
+      echo "GRADLE_NAME=$GRADLE_NAME" >$JAR_FOLDER/build.env # save it for next pipeline
+      echo "JAR_FOLDER=$JAR_FOLDER" >>$JAR_FOLDER/build.env # save the variable on the file
+      export GRADLE_VERSION=$(cat $JAR_FOLDER/p | grep "version:" | awk '{print $2}')   
+      echo "GRADLE_VERSION=$GRADLE_VERSION" >>$JAR_FOLDER/build.env    
+      [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.jar ]] && echo "GRADLE_EXT=jar" >>$JAR_FOLDER/build.env \
+        && export GRADLE_EXT=jar
+      if [[ "$GRADLE_EXT" == "" ]]; then 
+        [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.war ]] && echo "GRADLE_EXT=war" >>$JAR_FOLDER/build.env \
+        && export GRADLE_EXT=war 
+      fi
+      if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi  
+      
+build-docker: # build docker image
+  stage: build-docker
+  image: docker.io/openshift/origin-cli:latest
+  dependencies:
+    - build-app
+  script:
+    - | # run common scripts
+      . ocp/scripts/sethome.sh
+      . ocp/scripts/setcontext.sh
+      . ocp/scripts/getenv.sh
+      . ocp/scripts/s_replace.sh
+    - | # create the dockerconfig, project 
+      oc new-project $NAMESPACE 2>/dev/null || echo >/dev/null 
+      echo "PROJECT: $NAMESPACE"  
+      oc create secret docker-registry $PULLSECRET --docker-server=docker.io \
+        --docker-username=$DOCKER_USER \
+        --docker-password=$DOCKER_PASSWD \
+        --docker-email="" -n $NAMESPACE 2>/dev/null || echo >/dev/null
+        echo "PULLSECRET: $PULLSECRET"
+    - | # update the template        
+      . ocp/scripts/update_build.sh
+    - | # copy the bin   
+      cp $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.$GRADLE_EXT ocp/build
+    - | # change directory so that build will have only necessary files  
+      cd ocp/build
+      # add space on Dockerfile
+      . $HOME/ocp/scripts/addspaces.sh 
+      # Combine the files
+      cat "buildconfig1.yaml" "Dockerfile" "buildconfig2.yaml" > "buildconfig.yaml"
+      # check combined file
+      cat buildconfig.yaml
+      # check the current folder
+      ls -la
+    - | # execute the buildconfig  
+      # buildconfig always failed on the first
+      oc apply -f buildconfig.yaml --recursive --wait 2>/dev/null || echo >/dev/null
+      # start-build always success
+      oc start-build $GRADLE_NAME -n $NAMESPACE --from-dir $HOME/ocp/build --wait --follow 
+      cd ../..
+      # save credentail for helm use
+      cp $KUBECONFIG $HOME/ocp/   
+    - | # execute rbac-helm
+      oc apply -f ocp/build/rbac-helm.yaml      
+     
+deploy-openshift: # deploy to openshift
+  stage: deploy
+  image: docker.io/alpine/helm:latest
+  dependencies:
+    - build-docker  
+  script: 
+    - | # run common scripts
+      . ocp/scripts/sethome.sh
+      . ocp/scripts/getenv.sh      
+      . ocp/scripts/s_replace.sh
+    - | # get the openshift credential from the previous pipeline
+      mkdir -p $HOME/.kube
+      cp $HOME/ocp/KUBECONFIG $HOME/.kube/config 
+      chmod 600 $HOME/.kube/config 
+      chmod 600 $KUBECONFIG 
+      cat $HOME/.kube/config 
+    - | # to remove the warnings on the console output
+      chmod 600 -R ocp/helm/*.yaml 
+    - | # update the template  
+      . ocp/scripts/update_helm.sh
+      echo -----------
+      cat ocp/helm/Chart.yaml
+      echo -----------
+      cat ocp/helm/values.yaml     
+    - | # helm check  
+      cd ocp/helm  
+      helm dependency update     
+      helm lint . || exit 1 
+    - | # helm deploy the app
+      # you can only use either template or upgrade/install at a time 
+      helm upgrade --install $GRADLE_NAME .
+      

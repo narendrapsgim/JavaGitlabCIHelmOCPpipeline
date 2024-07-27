@@ -1,0 +1,1 @@
+/usr/bin/java -jar /app/app.jar

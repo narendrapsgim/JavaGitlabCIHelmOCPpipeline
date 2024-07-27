@@ -1,0 +1,26 @@
+#need to create where gitlab-runner going to reside
+#and serviceaccount gitlab-runner-app-sa 
+#exec by kubeadmin user
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: gitlab-runner
+  namespace: gitlab-dev
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gitlab-runner-role-binding
+  namespace: gitlab-dev
+subjects:
+- kind: ServiceAccount
+  name: gitlab-runner-app-sa
+  namespace: gitlab-dev
+roleRef:
+  kind: Role
+  name: gitlab-runner
+  apiGroup: rbac.authorization.k8s.io

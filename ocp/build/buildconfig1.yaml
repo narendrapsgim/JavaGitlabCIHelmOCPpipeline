@@ -1,0 +1,19 @@
+# template, it is using sed to replace var, becareful on the slash or f-slash
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: xNAMEx
+  namespace: xNAMESPACEx
+  labels:
+    name: xNAMEx
+spec:
+  triggers:
+    - type: ConfigChange
+  source:
+    type: Git
+    git:
+      uri: 'https://gitlab-ci-token:$GITLAB_TOKEN@gitlab.com/api/v4/xMAIN_GROUPx/xNAME_REPOx.git' 
+      ref: xBRANCHx
+    contextDir: "/"     
+    dockerfile: | 
+    

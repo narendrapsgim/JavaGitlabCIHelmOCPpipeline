@@ -1,0 +1,25 @@
+
+  strategy:
+    type: Docker
+    dockerStrategy:
+      buildArgs:
+        - name: DOCKER_IMAGE
+          value: "xREGISTRYx/xREPOSITORYx:xTAGx"
+        - name: GRADLE_BIN
+          value: "xGRADLE_BINx"
+        - name: ENV_CONTEXT
+          value: "xENV_CONTEXTx" 
+        - name: TIMEZONEREGION
+          value: "xTIMEZONEREGIONx"
+        - name: TIMEZONECITY
+          value: "xTIMEZONECITYx"       
+      forcePull: true 
+      pullSecret:
+        name: xPULLSECRETx
+  output:  
+    to:
+      kind: DockerImage
+      name: "xREGISTRYx/xDOCKER_USERx/xNAMEx:xAPPVERSIONx"
+    pushSecret:
+      name: xPULLSECRETx
+      

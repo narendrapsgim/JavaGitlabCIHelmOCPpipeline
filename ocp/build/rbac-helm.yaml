@@ -1,0 +1,25 @@
+
+# This is for Helm to execute properly, default sa should suffice from runner project
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: gitlab-runner
+  namespace: xNAMESPACEx
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gitlab-runner-role-binding
+  namespace: xNAMESPACEx
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: xNAMESPACE_RUNNERx
+roleRef:
+  kind: Role
+  name: gitlab-runner
+  apiGroup: rbac.authorization.k8s.io

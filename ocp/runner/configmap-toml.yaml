@@ -1,0 +1,22 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: custom-config-toml
+  namespace: gitlab-dev
+data:
+  config.toml: |-
+   [[runners]]
+        executor = "kubernetes"
+    [runners.kubernetes]
+        tls_verify = false
+        pull_policy = ["always"]
+        privileged = false
+    [runners.kubernetes.pod_security_context]
+        run_as_non_root = true
+        # run_as_user = 1000 # runner won't runner with this now
+    [[runners.kubernetes.volumes.empty_dir]]
+        name = "containers-dir"
+        mount_path = "/home/build/.local/share/containers"
+    [[runners.kubernetes.volumes.empty_dir]]
+        name = "runner-home-dir"
+        mount_path = "/home/gitlab-runner"

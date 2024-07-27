@@ -1,0 +1,32 @@
+# How to create Gitlab Group Runner
+
+    # Here's one of the youtube I did with this:
+        https://youtu.be/6lfl-AGiO_k
+
+    # create the project
+    oc new-project gitlab-dev
+
+    # add gitlab runner operator
+    ***go to webui Operators/Operator Hub/
+    ***search gitlab runner
+    ***install the certified, use all default settinngs
+
+    # create role/rolebinding
+    ***use serviceaccount=gitlab-runner-app-sa
+    ***the sa was created on installing the operator
+    oc apply -f rbac.yaml
+
+    # create the secret for the gitlab.com certificate
+    ***get the certificate from the https://gitlab.com and put it in a file
+    ***it's suppose to be the ca certificate but this will do as well
+    ***better always get new one, gitlab from time to time update it
+    oc create secret generic gitlab.com --from-file=tls.crt=gitlab.crt -n gitlab-dev
+
+    # create the gitlab runner
+    ***get the gitlab group runner token, see this https://youtu.be/D7qKoHeQL_8
+    ***update the gitlab-runner.yaml with the new token
+    oc apply -f gitlab-runner.yaml
+
+    # verify
+    ***go to your gitlab and check it, see above youtube how to do it
+    ***also check the pod gitlab-runner from the project with status running and ready 1/1
