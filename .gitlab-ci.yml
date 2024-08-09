@@ -3,9 +3,9 @@ include:
 
 stages:    
   - build-app
-  - scan-code
+  - check-code
   - build-docker
-  - scan-image
+  - scan
   - deploy
 
 default:
@@ -64,7 +64,7 @@ build-app: # build application
 
 
 scan-sonarqube: # scan with sonarqube
-  stage: scan-code
+  stage: check-code
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task     
@@ -127,11 +127,11 @@ build-docker: # build docker image
       oc apply -f ocp/build/rbac-helm.yaml   
 
 container_scanning:
-  stage: scan-image    
+  stage: scan   
   variables:
     CS_IMAGE: "$REGISTRY/$DOCKER_USER/$GRADLE_NAME:$GRADLE_VERSION"
     CS_REGISTRY_USER: $DOCKER_USER
-    CS_REGISTRY_PASSWORD: $DOCKER_PASSWD
+    CS_REGISTRY_PASSWORD: "$DOCKER_PASSWD"
     GIT_STRATEGY: fetch
      
 deploy-openshift: # deploy to openshift
