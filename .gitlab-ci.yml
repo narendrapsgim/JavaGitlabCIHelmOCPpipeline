@@ -5,7 +5,7 @@ stages:
   - build-app
   - scan-code
   - build-docker
-  - scan
+  - scan-image
   - deploy
 
 default:
@@ -127,11 +127,11 @@ build-docker: # build docker image
       oc apply -f ocp/build/rbac-helm.yaml   
 
 container_scanning:
-  stage: scan    
+  stage: scan-image    
   variables:
-    CS_IMAGE: docker.io/$DOCKER_USER/$GRADLE_NAME:$GRADLE_VERSION
+    CS_IMAGE: $REGISTRY/$DOCKER_USER/$GRADLE_NAME:$GRADLE_VERSION
     CS_REGISTRY_USER: $DOCKER_USER
-    CS_REGISTRY_PASSWORD: $DOCKER_PASSWD
+    CS_REGISTRY_PASSWORD: "$DOCKER_PASSWD"
     GIT_STRATEGY: fetch
      
 deploy-openshift: # deploy to openshift
