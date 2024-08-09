@@ -1,7 +1,11 @@
+include:
+  - template: Jobs/Container-Scanning.gitlab-ci.yml
+
 stages:    
   - build-app
   - scan-code
   - build-docker
+  - scan-image
   - deploy
 
 default:
@@ -118,7 +122,14 @@ build-docker: # build docker image
       # save credentail for helm use
       cp $KUBECONFIG $HOME/ocp/   
     - | # execute rbac-helm
-      oc apply -f ocp/build/rbac-helm.yaml      
+      oc apply -f ocp/build/rbac-helm.yaml   
+
+container_scanning:
+  stage: scan-image      
+  variables:
+    CS_IMAGE: docker.io/$DOCKER_USER/$GRADLE_NAME:$GRADLE_VERSION
+    CS_REGISTRY_USER: $DOCKER_USER
+    CS_REGISTRY_PASSWORD: $DOCKER_PASSWD
      
 deploy-openshift: # deploy to openshift
   stage: deploy
