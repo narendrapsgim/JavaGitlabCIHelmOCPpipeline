@@ -131,6 +131,8 @@ container_scanning:
     CS_REGISTRY_USER: $DOCKER_USER
     CS_REGISTRY_PASSWORD: "$DOCKER_PASSWD"
     GIT_STRATEGY: fetch
+  before_script:
+    - . ocp/scripts/getenv.sh
      
 deploy-openshift: # deploy to openshift
   stage: deploy
