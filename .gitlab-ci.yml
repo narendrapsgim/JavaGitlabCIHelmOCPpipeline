@@ -3,9 +3,9 @@ include:
 
 stages:    
   - build-app
-  - check-code
+  - scan-code
   - build-docker
-  - scan
+  - scan-image
   - deploy
 
 default:
@@ -15,8 +15,6 @@ default:
       - build/libs/* 
       - ocp/* 
     expire_in: 3h    
-  only:
-  - main
 
 variables:
   NAMESPACE: gitlab-qa
@@ -64,7 +62,7 @@ build-app: # build application
 
 
 scan-sonarqube: # scan with sonarqube
-  stage: check-code
+  stage: scan-code
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task     
@@ -127,9 +125,9 @@ build-docker: # build docker image
       oc apply -f ocp/build/rbac-helm.yaml   
 
 container_scanning:
-  stage: scan   
+  stage: scan-image      
   variables:
-    CS_IMAGE: "$REGISTRY/$DOCKER_USER/$GRADLE_NAME:$GRADLE_VERSION"
+    CS_IMAGE: $REGISTRY/$DOCKER_USER/$GRADLE_NAME:$GRADLE_VERSION
     CS_REGISTRY_USER: $DOCKER_USER
     CS_REGISTRY_PASSWORD: "$DOCKER_PASSWD"
     GIT_STRATEGY: fetch
