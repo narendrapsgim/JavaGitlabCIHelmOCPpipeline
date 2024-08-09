@@ -5,7 +5,7 @@ metadata:
   namespace: gitlab-dev
 type: Opaque
 stringData:
-  runner-registration-token: glrt-Fg-NnXzWsZ1wAJ2k2nW3
+  runner-registration-token: glrt-s4MrJXrEJQ_PmcYVnUg4
 ---
 apiVersion: apps.gitlab.com/v1beta2 
 kind: Runner
