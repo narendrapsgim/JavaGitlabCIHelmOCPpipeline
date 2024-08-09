@@ -1,8 +1,8 @@
 stages:    
   - build-app
   - scan-code
-  # - build-docker
-  # - deploy
+  - build-docker
+  - deploy
 
 default:
   tags: ['uni-runner']  
@@ -55,8 +55,8 @@ build-app: # build application
         && export GRADLE_EXT=war 
       fi
       if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi  
-   
-      
+
+
 scan-sonarqube: # scan with sonarqube
   stage: scan-code
   variables:
@@ -68,15 +68,15 @@ scan-sonarqube: # scan with sonarqube
     paths:
       - .sonar/cache
   script:
-    - | 
-      # run common scripts
-      . ocp/scripts/sethome.sh   
-      # run sonarqube scan
+    - | # run common scripts
+      . ocp/scripts/sethome.sh
+      . ocp/scripts/getenv.sh
+    - | # run sonarqube scan
       gradle sonarqube
   only:
     - main
 
-.build-docker: # build docker image
+build-docker: # build docker image
   stage: build-docker
   image: docker.io/openshift/origin-cli:latest
   dependencies:
@@ -120,7 +120,7 @@ scan-sonarqube: # scan with sonarqube
     - | # execute rbac-helm
       oc apply -f ocp/build/rbac-helm.yaml      
      
-.deploy-openshift: # deploy to openshift
+deploy-openshift: # deploy to openshift
   stage: deploy
   image: docker.io/alpine/helm:latest
   dependencies:
