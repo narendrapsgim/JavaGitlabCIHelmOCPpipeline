@@ -14,9 +14,7 @@ default:
     paths:
       - build/libs/* 
       - ocp/* 
-    expire_in: 3h  
-    reports:
-      dotenv: build.env    
+    expire_in: 3h    
 
 variables:
   NAMESPACE: gitlab-qa
@@ -56,27 +54,24 @@ build-app: # build application
       /usr/bin/gradle properties -q >$JAR_FOLDER/p # save the settings    
     - | # save the parameters
       export GRADLE_NAME=$(cat $JAR_FOLDER/p | grep "name:" | awk '{print $2}') # get variable from gradle 
-      echo "GRADLE_NAME=$GRADLE_NAME" >build.env # save it for next pipeline
-      echo "JAR_FOLDER=$JAR_FOLDER" >>build.env # save the variable on the file
+      echo "GRADLE_NAME=$GRADLE_NAME" >$JAR_FOLDER/build.env # save it for next pipeline
+      echo "JAR_FOLDER=$JAR_FOLDER" >>$JAR_FOLDER/build.env # save the variable on the file
       export GRADLE_VERSION=$(cat $JAR_FOLDER/p | grep "version:" | awk '{print $2}')   
-      echo "GRADLE_VERSION=$GRADLE_VERSION" >>build.env    
-      [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.jar ]] && echo "GRADLE_EXT=jar" >>build.env \
+      echo "GRADLE_VERSION=$GRADLE_VERSION" >>$JAR_FOLDER/build.env    
+      [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.jar ]] && echo "GRADLE_EXT=jar" >>$JAR_FOLDER/build.env \
         && export GRADLE_EXT=jar
       if [[ "$GRADLE_EXT" == "" ]]; then 
-        [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.war ]] && echo "GRADLE_EXT=war" >>build.env \
+        [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.war ]] && echo "GRADLE_EXT=war" >>$JAR_FOLDER/build.env \
         && export GRADLE_EXT=war 
       fi
-      if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi 
-      
+      if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi        
+
 scan-sonarqube: # scan with sonarqube
   stage: test
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task     
   image: gradle:jdk17-focal
-  needs:
-    - job: build-app
-      artifacts: true  
   dependencies:
     - build-app 
   cache:
@@ -89,6 +84,7 @@ scan-sonarqube: # scan with sonarqube
       mkdir -p $GRADLE_USER_HOME
     - | # run common scripts
       . ocp/scripts/sethome.sh
+      . ocp/scripts/getenv.sh
       ./gradlew wrapper --gradle-version=8.5
     - | # run sonarqube scan
       gradle sonarqube
@@ -97,15 +93,13 @@ scan-sonarqube: # scan with sonarqube
 build-docker: # build docker image
   stage: build-docker
   image: docker.io/openshift/origin-cli:latest
-  needs:
-    - job: scan-sonarqube
-      artifacts: true    
   dependencies:
     - scan-sonarqube
   script:
     - | # run common scripts
       . ocp/scripts/sethome.sh
       . ocp/scripts/setcontext.sh
+      . ocp/scripts/getenv.sh
       . ocp/scripts/s_replace.sh
     - | # create the dockerconfig, project 
       oc new-project $NAMESPACE 2>/dev/null || echo >/dev/null 
@@ -138,8 +132,13 @@ build-docker: # build docker image
       # save credentail for helm use
       cp $KUBECONFIG $HOME/ocp/   
     - | # execute rbac-helm
-      oc apply -f ocp/build/rbac-helm.yaml    
-      
+      oc apply -f ocp/build/rbac-helm.yaml  
+    - | # save GRADLE_NAME for container_scanning
+      echo "GRADLE_NAME=$GRADLE_NAME" > variables.env # work with container_scanning       
+  artifacts:
+    reports:
+      dotenv: variables.env # this is the only one that work with container_scanning    
+
 container_scanning:
   stage: scan-image  
   needs:
@@ -157,14 +156,12 @@ container_scanning:
 deploy-openshift: # deploy to openshift
   stage: deploy
   image: $REGISTRY/alpine/helm:latest
-  needs:
-    - job: container_scanning
-      artifacts: true  
   dependencies:
-    - container_scanning
+    - build-docker
   script: 
     - | # run common scripts
       . ocp/scripts/sethome.sh
+      . ocp/scripts/getenv.sh      
       . ocp/scripts/s_replace.sh
     - | # get the openshift credential from the previous pipeline
       mkdir -p $HOME/.kube
