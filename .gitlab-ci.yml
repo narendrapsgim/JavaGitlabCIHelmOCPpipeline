@@ -52,8 +52,7 @@ build-app: # build application
       export GRADLE_NAME=$(cat $JAR_FOLDER/p | grep "name:" | awk '{print $2}') # get variable from gradle 
       echo "GRADLE_NAME=$GRADLE_NAME" >$JAR_FOLDER/build.env # save it for next pipeline
       echo "JAR_FOLDER=$JAR_FOLDER" >>$JAR_FOLDER/build.env # save the variable on the file
-      export GRADLE_VERSION="latest"
-      echo "GRADLE_VERSION=$GRADLE_VERSION" >>$JAR_FOLDER/build.env    
+      export GRADLE_VERSION=$(cat $JAR_FOLDER/p | grep "version:" | awk '{print $2}')   
       [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.jar ]] && echo "GRADLE_EXT=jar" >>$JAR_FOLDER/build.env \
         && export GRADLE_EXT=jar
       if [[ "$GRADLE_EXT" == "" ]]; then 
@@ -61,7 +60,8 @@ build-app: # build application
         && export GRADLE_EXT=war 
       fi
       if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi  
-
+      export GRADLE_VERSION=latest
+      echo "GRADLE_VERSION=$GRADLE_VERSION" >>$JAR_FOLDER/build.env    
 
 scan-sonarqube: # scan with sonarqube
   stage: scan-code
@@ -96,7 +96,7 @@ build-docker: # build docker image
     - | # create the dockerconfig, project 
       oc new-project $NAMESPACE 2>/dev/null || echo >/dev/null 
       echo "PROJECT: $NAMESPACE"  
-      oc create secret docker-registry $PULLSECRET --docker-server=docker.io \
+      oc create secret docker-registry $PULLSECRET --docker-server=$REGISTRY \
         --docker-username=$DOCKER_USER \
         --docker-password=$DOCKER_PASSWD \
         --docker-email="" -n $NAMESPACE 2>/dev/null || echo >/dev/null
@@ -138,7 +138,7 @@ container_scanning:
      
 deploy-openshift: # deploy to openshift
   stage: deploy
-  image: docker.io/alpine/helm:latest
+  image: $REGISTRY/alpine/helm:latest
   dependencies:
     - build-docker  
   script: 
