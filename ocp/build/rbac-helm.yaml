@@ -18,7 +18,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: default
-  namespace: xNAMESPACE_RUNNERx
+  namespace: xNAMESPACE_RUNNERx # important: need to be the namespace where runner resides
 roleRef:
   kind: Role
   name: gitlab-runner

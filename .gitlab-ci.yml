@@ -51,15 +51,14 @@ build-app: # build application
       echo "GRADLE_NAME=$GRADLE_NAME" >$JAR_FOLDER/build.env # save it for next pipeline
       echo "JAR_FOLDER=$JAR_FOLDER" >>$JAR_FOLDER/build.env # save the variable on the file
       export GRADLE_VERSION=$(cat $JAR_FOLDER/p | grep "version:" | awk '{print $2}')   
+      echo "GRADLE_VERSION=$GRADLE_VERSION" >>$JAR_FOLDER/build.env    
       [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.jar ]] && echo "GRADLE_EXT=jar" >>$JAR_FOLDER/build.env \
         && export GRADLE_EXT=jar
       if [[ "$GRADLE_EXT" == "" ]]; then 
         [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.war ]] && echo "GRADLE_EXT=war" >>$JAR_FOLDER/build.env \
         && export GRADLE_EXT=war 
       fi
-      if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi  
-      export GRADLE_VERSION=latest
-      echo "GRADLE_VERSION=$GRADLE_VERSION" >>$JAR_FOLDER/build.env    
+      if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi        
 
 scan-sonarqube: # scan with sonarqube
   stage: scan-code

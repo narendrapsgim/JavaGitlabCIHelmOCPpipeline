@@ -10,7 +10,7 @@ do
     s_replace "xNAMESPACE_RUNNERx" "$NAMESPACE_RUNNER" "$i"
     s_replace "xNAMEx" "$GRADLE_NAME" "$i"
     s_replace "xPULLSECRETx" "$PULLSECRET" "$i"
-    s_replace "xAPPVERSIONx" "$GRADLE_VERSION" "$i"
+    s_replace "xAPPVERSIONx" "latest" "$i"
     s_replace "xGRADLE_BINx" "$GRADLE_NAME-$GRADLE_VERSION.$GRADLE_EXT" "$i"
     s_replace "xTIMEZONEREGIONx" "$TIMEZONEREGION" "$i"
     s_replace "xTIMEZONECITYx" "$TIMEZONECITY" "$i"
