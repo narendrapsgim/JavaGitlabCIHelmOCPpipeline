@@ -36,7 +36,9 @@ variables:
 
 build-app: # build application
   stage: build-app   
-  image: docker.io/library/gradle:8-jdk11
+  image: image: gradle:jdk11-alpine
+  before_script:
+    - apt-get update && apt-get install -y libc6-dev
   script: 
     - | # run common scripts
       . ocp/scripts/sethome.sh
