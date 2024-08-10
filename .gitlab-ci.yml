@@ -67,7 +67,7 @@ build-app: # build application
         && export GRADLE_EXT=war 
       fi
       if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi 
-      echo "GRADLE_NAME=$GRADLE_NAME" > variables.env # works with container_scanning      
+      echo "GRADLE_NAME=$GRADLE_NAME" > variables.env # work with container_scanning      
 
 .scan-sonarqube: # scan with sonarqube
   stage: test
@@ -142,11 +142,14 @@ container_scanning:
   needs:
     - job: build-app
       artifacts: true
+  dependencies:
+    - build-app
   variables:
     CS_IMAGE: $REGISTRY/$DOCKER_USER/$GRADLE_NAME:latest
     CS_REGISTRY_USER: $DOCKER_USER
     CS_REGISTRY_PASSWORD: $DOCKER_PASSWD
     GIT_STRATEGY: fetch
+
 
 .deploy-openshift: # deploy to openshift
   stage: deploy
@@ -179,4 +182,3 @@ container_scanning:
     - | # helm deploy the app
       # you can only use either template or upgrade/install at a time 
       helm upgrade --install $GRADLE_NAME .   
-      
