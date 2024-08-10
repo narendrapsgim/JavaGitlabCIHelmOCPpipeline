@@ -1,3 +1,4 @@
+# for container_scanning, this is internal to Gitlab repo
 include:
   - template: Jobs/Container-Scanning.gitlab-ci.yml
 
@@ -68,7 +69,7 @@ build-app: # build application
       fi
       if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi 
       
-scan-sonarqube: # scan with sonarqube
+scan-sonarqube: # check code with sonarqube cloud
   stage: test
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
@@ -90,7 +91,6 @@ scan-sonarqube: # scan with sonarqube
       ./gradlew wrapper --gradle-version=8.5
     - | # run sonarqube scan
       gradle sonarqube
-
 
 build-docker: # build docker image
   stage: build-docker
