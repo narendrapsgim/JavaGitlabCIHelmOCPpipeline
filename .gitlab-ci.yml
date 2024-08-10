@@ -65,8 +65,6 @@ build-app: # build application
         && export GRADLE_EXT=war 
       fi
       if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi        
-  only:
-    - main
 
 scan-sonarqube: # scan with sonarqube
   stage: test
@@ -90,8 +88,7 @@ scan-sonarqube: # scan with sonarqube
       ./gradlew wrapper --gradle-version=8.5
     - | # run sonarqube scan
       gradle sonarqube
-  only:
-    - main
+
 
 build-docker: # build docker image
   stage: build-docker
@@ -136,8 +133,6 @@ build-docker: # build docker image
       cp $KUBECONFIG $HOME/ocp/   
     - | # execute rbac-helm
       oc apply -f ocp/build/rbac-helm.yaml   
-  only:
-    - main
 
 container_scanning:
   stage: scan-image      
@@ -150,8 +145,6 @@ container_scanning:
     - build-docker
   before_script:
     - . ocp/scripts/getenv.sh
-  only:
-    - main
 
 deploy-openshift: # deploy to openshift
   stage: deploy
@@ -183,6 +176,4 @@ deploy-openshift: # deploy to openshift
       helm lint . || exit 1 
     - | # helm deploy the app
       # you can only use either template or upgrade/install at a time 
-      helm upgrade --install $GRADLE_NAME .
-  only:
-    - main      
+      helm upgrade --install $GRADLE_NAME .   
