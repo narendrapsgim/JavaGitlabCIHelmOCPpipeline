@@ -37,21 +37,15 @@ variables:
   HOSTNAME: jvm-$NAMESPACE.apps-crc.testing
 
 build-app: # build application
-  variables:
-    GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
   stage: build-app   
-  image: gradle:jdk11-alpine
-  cache:
-    paths:
-      - .gradle/wrapper
-      - .gradle/caches
+  image: docker.io/library/gradle:8-jdk11
   script: 
     - | # run common scripts
       . ocp/scripts/sethome.sh
     - | # build the app  
       echo "Starting to build project"
       export JAR_FOLDER=build/libs
-      export GRADLE_USER_HOME="$CI_PROJECT_DIR/.gradle"
+      export JAVA_HOME=/opt/java/openjdk   
       /usr/bin/gradle build -x test
       /usr/bin/gradle properties -q >$JAR_FOLDER/p # save the settings    
     - | # save the parameters
@@ -66,8 +60,7 @@ build-app: # build application
         [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.war ]] && echo "GRADLE_EXT=war" >>$JAR_FOLDER/build.env \
         && export GRADLE_EXT=war 
       fi
-      if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi 
-      echo "GRADLE_NAME=$GRADLE_NAME" > variables.env # work with container_scanning      
+      if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi   
 
 scan-sonarqube: # scan with sonarqube
   stage: test
