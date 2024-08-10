@@ -67,7 +67,7 @@ build-app: # build application
         && export GRADLE_EXT=war 
       fi
       if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi 
-      echo "GRADLE_NAME=$GRADLE_NAME" > variables.env # work with container_scanning        
+      echo "GRADLE_NAME=$GRADLE_NAME" > variables.env # work with container_scanning      
 
 scan-sonarqube: # scan with sonarqube
   stage: test
