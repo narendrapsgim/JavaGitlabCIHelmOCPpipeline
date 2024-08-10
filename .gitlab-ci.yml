@@ -92,7 +92,7 @@ scan-sonarqube: # scan with sonarqube
 
 build-docker: # build docker image
   stage: build-docker
-  image: docker.io/openshift/origin-cli:latest
+  image: $REGISTRY/openshift/origin-cli:latest
   dependencies:
     - scan-sonarqube
   script:
@@ -156,7 +156,7 @@ deploy-openshift: # deploy to openshift
   stage: deploy
   image: $REGISTRY/alpine/helm:latest
   dependencies:
-    - container_scanning
+    - build-docker
   script: 
     - | # run common scripts
       . ocp/scripts/sethome.sh
