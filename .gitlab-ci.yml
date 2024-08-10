@@ -14,7 +14,9 @@ default:
     paths:
       - build/libs/* 
       - ocp/* 
-    expire_in: 3h     
+    expire_in: 3h  
+    reports:
+      dotenv: variables.env    
 
 variables:
   NAMESPACE: gitlab-qa
@@ -64,7 +66,8 @@ build-app: # build application
         [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.war ]] && echo "GRADLE_EXT=war" >>$JAR_FOLDER/build.env \
         && export GRADLE_EXT=war 
       fi
-      if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi        
+      if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi 
+      echo "GRADLE_NAME=$GRADLE_NAME" > variables.env       
 
 .scan-sonarqube: # scan with sonarqube
   stage: test
@@ -83,8 +86,8 @@ build-app: # build application
       export GRADLE_USER_HOME="/tmp/gradle"
       mkdir -p $GRADLE_USER_HOME
     - | # run common scripts
-      . ocp/scripts/sethome.sh
-      . ocp/scripts/getenv.sh
+      ./ocp/scripts/sethome.sh
+      ./ocp/scripts/getenv.sh
       ./gradlew wrapper --gradle-version=8.5
     - | # run sonarqube scan
       gradle sonarqube
@@ -97,10 +100,10 @@ build-app: # build application
     - scan-sonarqube
   script:
     - | # run common scripts
-      . ocp/scripts/sethome.sh
-      . ocp/scripts/setcontext.sh
-      . ocp/scripts/getenv.sh
-      . ocp/scripts/s_replace.sh
+      ./ocp/scripts/sethome.sh
+      ./ocp/scripts/setcontext.sh
+      ./ocp/scripts/getenv.sh
+      ./ocp/scripts/s_replace.sh
     - | # create the dockerconfig, project 
       oc new-project $NAMESPACE 2>/dev/null || echo >/dev/null 
       echo "PROJECT: $NAMESPACE"  
@@ -136,6 +139,9 @@ build-app: # build application
 
 container_scanning:
   stage: scan-image  
+  needs:
+    - job: build-app
+      artifacts: true
   dependencies:
     - build-app
   variables:
@@ -143,12 +149,12 @@ container_scanning:
     CS_REGISTRY_USER: $DOCKER_USER
     CS_REGISTRY_PASSWORD: $DOCKER_PASSWD
     GIT_STRATEGY: fetch
-  script:
-    - |
-      ./ocp/scripts/sethome.sh
-      ./ocp/scripts/getenv.sh    
-      echo $GRADLE_NAME
-      gtcs scan
+  # script:
+  #   - |
+  #     ./ocp/scripts/sethome.sh
+  #     ./ocp/scripts/getenv.sh    
+  #     echo $GRADLE_NAME
+  #     gtcs scan
 
 
 .deploy-openshift: # deploy to openshift
@@ -158,9 +164,9 @@ container_scanning:
     - build-docker
   script: 
     - | # run common scripts
-      . ocp/scripts/sethome.sh
-      . ocp/scripts/getenv.sh      
-      . ocp/scripts/s_replace.sh
+      ./ocp/scripts/sethome.sh
+      ./ocp/scripts/getenv.sh      
+      ./ocp/scripts/s_replace.sh
     - | # get the openshift credential from the previous pipeline
       mkdir -p $HOME/.kube
       cp $HOME/ocp/KUBECONFIG $HOME/.kube/config 
