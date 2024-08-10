@@ -43,8 +43,6 @@ build-app: # build application
     paths:
       - .gradle/wrapper
       - .gradle/caches
-  before_script:
-    - apk add --no-cache libc6-compat
   script: 
     - | # run common scripts
       . ocp/scripts/sethome.sh
