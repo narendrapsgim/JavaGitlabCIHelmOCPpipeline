@@ -86,8 +86,8 @@ scan-sonarqube: # scan with sonarqube
       export GRADLE_USER_HOME="/tmp/gradle"
       mkdir -p $GRADLE_USER_HOME
     - | # run common scripts
-      ./ocp/scripts/sethome.sh
-      ./ocp/scripts/getenv.sh
+      . ocp/scripts/sethome.sh
+      . ocp/scripts/getenv.sh
       ./gradlew wrapper --gradle-version=8.5
     - | # run sonarqube scan
       gradle sonarqube
@@ -100,10 +100,10 @@ build-docker: # build docker image
     - scan-sonarqube
   script:
     - | # run common scripts
-      ./ocp/scripts/sethome.sh
-      ./ocp/scripts/setcontext.sh
-      ./ocp/scripts/getenv.sh
-      ./ocp/scripts/s_replace.sh
+      . ocp/scripts/sethome.sh
+      . ocp/scripts/setcontext.sh
+      . ocp/scripts/getenv.sh
+      . ocp/scripts/s_replace.sh
     - | # create the dockerconfig, project 
       oc new-project $NAMESPACE 2>/dev/null || echo >/dev/null 
       echo "PROJECT: $NAMESPACE"  
@@ -158,9 +158,9 @@ deploy-openshift: # deploy to openshift
     - build-docker
   script: 
     - | # run common scripts
-      ./ocp/scripts/sethome.sh
-      ./ocp/scripts/getenv.sh      
-      ./ocp/scripts/s_replace.sh
+      . ocp/scripts/sethome.sh
+      . ocp/scripts/getenv.sh      
+      . ocp/scripts/s_replace.sh
     - | # get the openshift credential from the previous pipeline
       mkdir -p $HOME/.kube
       cp $HOME/ocp/KUBECONFIG $HOME/.kube/config 
