@@ -141,7 +141,7 @@ container_scanning:
   before_script:
     - . ocp/scripts/sethome.sh
     - . ocp/scripts/getenv.sh    
-    - cat ocp/scripts/getenv.sh     
+    - cat build/libs/build.env    
   variables:
     CS_IMAGE: $REGISTRY/$DOCKER_USER/$GRADLE_NAME:latest
     CS_REGISTRY_USER: $DOCKER_USER
