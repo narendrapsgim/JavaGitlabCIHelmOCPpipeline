@@ -65,10 +65,6 @@ build-app: # build application
         && export GRADLE_EXT=war 
       fi
       if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi        
-      echo GRADLE_NAME=$GRADLE_NAME > build.env
-  artifacts:
-    reports:
-      dotenv: build.env
 
 .scan-sonarqube: # scan with sonarqube
   stage: test
@@ -139,12 +135,20 @@ build-app: # build application
       oc apply -f ocp/build/rbac-helm.yaml   
 
 container_scanning:
-  stage: scan-image      
+  stage: scan-image  
+  dependencies:
+    - build-app
+  before_script:
+    - . ocp/scripts/sethome.sh
+    - . ocp/scripts/getenv.sh          
   variables:
     CS_IMAGE: $REGISTRY/$DOCKER_USER/$GRADLE_NAME:latest
     CS_REGISTRY_USER: $DOCKER_USER
     CS_REGISTRY_PASSWORD: $DOCKER_PASSWD
     GIT_STRATEGY: fetch
+  script:
+    - echo "$CS_IMAGE"
+    - gtcs scan
 
 
 .deploy-openshift: # deploy to openshift
