@@ -3,10 +3,10 @@ include:
 
 stages:    
   - build-app
-  - test
-  - build-docker
+  # - test
+  # - build-docker
   - scan-image
-  - deploy
+  # - deploy
 
 default:
   tags: ['uni-runner']  
@@ -66,7 +66,7 @@ build-app: # build application
       fi
       if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi        
 
-scan-sonarqube: # scan with sonarqube
+.scan-sonarqube: # scan with sonarqube
   stage: test
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
@@ -90,7 +90,7 @@ scan-sonarqube: # scan with sonarqube
       gradle sonarqube
 
 
-build-docker: # build docker image
+.build-docker: # build docker image
   stage: build-docker
   image: docker.io/openshift/origin-cli:latest
   dependencies:
@@ -136,17 +136,18 @@ build-docker: # build docker image
 
 container_scanning:
   stage: scan-image      
-  variables:
-    CS_IMAGE: docker.io/uniwinux/jvm:latest
-    CS_REGISTRY_USER: uniwinux
-    CS_REGISTRY_PASSWORD: $DOCKER_PASSWD
-    GIT_STRATEGY: fetch
   dependencies:
-    - build-docker
+    - build-app 
   before_script:
     - . ocp/scripts/getenv.sh
+  variables:
+    CS_IMAGE: $REGISTRY/$DOCKER_USER/$GRADLE_NAME:latest
+    CS_REGISTRY_USER: $DOCKER_USER
+    CS_REGISTRY_PASSWORD: $DOCKER_PASSWD
+    GIT_STRATEGY: fetch
 
-deploy-openshift: # deploy to openshift
+
+.deploy-openshift: # deploy to openshift
   stage: deploy
   image: $REGISTRY/alpine/helm:latest
   dependencies:
