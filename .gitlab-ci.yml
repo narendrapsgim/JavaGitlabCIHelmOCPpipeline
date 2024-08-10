@@ -146,7 +146,7 @@ container_scanning:
     - job: build-docker
       artifacts: true
   dependencies:
-    - build-app
+    - build-docker
   variables:
     CS_IMAGE: $REGISTRY/$DOCKER_USER/$GRADLE_NAME:latest
     CS_REGISTRY_USER: $DOCKER_USER
@@ -158,7 +158,7 @@ deploy-openshift: # deploy to openshift
   stage: deploy
   image: $REGISTRY/alpine/helm:latest
   needs:
-    - job: build-docker
+    - job: container_scanning
       artifacts: true  
   dependencies:
     - container_scanning
