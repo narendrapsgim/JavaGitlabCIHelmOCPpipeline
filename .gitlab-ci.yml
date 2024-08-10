@@ -1,3 +1,4 @@
+# this is needed for container_scanning and internal to gitlab yml
 include:
   - template: Jobs/Container-Scanning.gitlab-ci.yml
 
@@ -89,7 +90,6 @@ scan-sonarqube: # scan with sonarqube
     - | # run sonarqube scan
       gradle sonarqube
 
-
 build-docker: # build docker image
   stage: build-docker
   image: docker.io/openshift/origin-cli:latest
@@ -152,12 +152,11 @@ container_scanning:
     CS_REGISTRY_PASSWORD: $DOCKER_PASSWD
     GIT_STRATEGY: fetch
 
-
 deploy-openshift: # deploy to openshift
   stage: deploy
   image: $REGISTRY/alpine/helm:latest
   dependencies:
-    - build-docker
+    - container_scanning
   script: 
     - | # run common scripts
       . ocp/scripts/sethome.sh
