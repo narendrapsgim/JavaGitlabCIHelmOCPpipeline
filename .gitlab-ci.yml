@@ -38,6 +38,7 @@ build-app: # build application
   stage: build-app   
   image: gradle:jdk11-alpine
   before_script:
+    - . ocp/scripts/sethome.sh
     - apt-get update && apt-get install -y libc6-dev
   script: 
     - | # run common scripts
