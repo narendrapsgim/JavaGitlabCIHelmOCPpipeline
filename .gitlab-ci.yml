@@ -36,7 +36,7 @@ variables:
 
 build-app: # build application
   stage: build-app   
-  image: image: gradle:jdk11-alpine
+  image: gradle:jdk11-alpine
   before_script:
     - apt-get update && apt-get install -y libc6-dev
   script: 
