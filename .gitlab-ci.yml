@@ -53,7 +53,7 @@ build-app: # build application
       echo "GRADLE_NAME=$GRADLE_NAME" >$JAR_FOLDER/build.env # save it for next pipeline
       echo "JAR_FOLDER=$JAR_FOLDER" >>$JAR_FOLDER/build.env # save the variable on the file
       #export GRADLE_VERSION=$(cat $JAR_FOLDER/p | grep "version:" | awk '{print $2}')   
-      export GRADLE_VERSION=latest
+      export GRADLE_VERSION="latest"
       echo "GRADLE_VERSION=$GRADLE_VERSION" >>$JAR_FOLDER/build.env    
       [[ -f $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.jar ]] && echo "GRADLE_EXT=jar" >>$JAR_FOLDER/build.env \
         && export GRADLE_EXT=jar
