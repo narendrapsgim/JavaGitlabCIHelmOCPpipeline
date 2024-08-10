@@ -16,8 +16,7 @@ default:
       - ocp/* 
     expire_in: 3h  
     reports:
-      dotenv: build.env 
-    expire_in: 3h    
+      dotenv: build.env    
 
 variables:
   NAMESPACE: gitlab-qa
