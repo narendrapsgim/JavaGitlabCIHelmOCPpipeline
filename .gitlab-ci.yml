@@ -3,10 +3,10 @@ include:
 
 stages:    
   - build-app
-  # - test
-  # - build-docker
+  - test
+  - build-docker
   - scan-image
-  # - deploy
+  - deploy
 
 default:
   tags: ['uni-runner']  
@@ -69,7 +69,7 @@ build-app: # build application
       if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi 
       echo "GRADLE_NAME=$GRADLE_NAME" > variables.env # work with container_scanning      
 
-.scan-sonarqube: # scan with sonarqube
+scan-sonarqube: # scan with sonarqube
   stage: test
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
@@ -93,7 +93,7 @@ build-app: # build application
       gradle sonarqube
 
 
-.build-docker: # build docker image
+build-docker: # build docker image
   stage: build-docker
   image: docker.io/openshift/origin-cli:latest
   dependencies:
@@ -151,7 +151,7 @@ container_scanning:
     GIT_STRATEGY: fetch
 
 
-.deploy-openshift: # deploy to openshift
+deploy-openshift: # deploy to openshift
   stage: deploy
   image: $REGISTRY/alpine/helm:latest
   dependencies:
