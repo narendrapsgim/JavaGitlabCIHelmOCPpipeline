@@ -14,9 +14,7 @@ default:
     paths:
       - build/libs/* 
       - ocp/* 
-    expire_in: 3h  
-  only:
-  - main    
+    expire_in: 3h     
 
 variables:
   NAMESPACE: gitlab-qa
