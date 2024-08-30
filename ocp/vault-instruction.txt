@@ -1,0 +1,121 @@
+# kubernetes testing with secret ####################
+# use killerkoda
+k create secret generic my-secret --from-literal=password=123456
+
+k get secret my-secret -o yaml
+
+ echo MTIzNDU2 | base64 --decode
+ 
+apt-get install etcd-client # not use in dnf
+
+k get pods -n kube-system
+
+ETCDCTL_API=3 etcdctl \
+   --cacert=/etc/kubernetes/pki/etcd/ca.crt   \
+   --cert=/etc/kubernetes/pki/etcd/server.crt \
+   --key=/etc/kubernetes/pki/etcd/server.key  \
+   get /registry/secrets/default/my-secret | hexdump -C
+   
+
+# openshift ##########################  
+oc new-project vault
+helm repo add hashicorp https://helm.releases.hashicorp.com
+helm install vault hashicorp/vault \
+    --set "global.openshift=true" \
+    --set "server.dev.enabled=true" \
+    --set "server.image.repository=docker.io/hashicorp/vault" \
+    --set "injector.image.repository=docker.io/hashicorp/vault-k8s" \
+    --set "injector.enabled=true" \
+    --set "authdelegator.enabled=true" \
+	--set "ui.enabled=true" --dry-run   
+***need to add route on UI manual, see below
+
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: vault
+  namespace: vault
+  labels:
+    app: vault
+spec:
+  host: vault-vault.apps-crc.testing
+  to:
+    kind: Service
+    name: vault
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
+  wildcardPolicy: None
+  
+ 
+# create the auth kubernetes named kubernetes
+   vault auth enable kubernetes
+create the secret named prod1 type=kv-v2   
+   #vault secrets enable -path prod1 kv-v2 # for testing only
+configure the vault backend
+   export VAULT_SKIP_VERIFY=true
+   export VAULT_ADDR=https://vault-vault.apps-crc.testing
+   vault write auth/kubernetes/config kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR"  
+
+# get certificate of ocp, not needed on kubernetes access
+oc config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}' | base64 --decode  
+   
+create the secret on vault,
+   vault kv put secret/ocp-runner/jvm/gitlab my-secret="your-token"
+
+   
+vault policy write secret-ocp-runner-vso - <<EOF
+path "secret/data/ocp-runner/*" {
+  capabilities = ["read"]
+}
+EOF
+#create the auth on vault,
+vault write auth/kubernetes/role/secret-ocp-runner-vso \
+bound_service_account_names=* \
+bound_service_account_namespaces=* \
+policies=secret-ocp-runner-vso \
+ttl=24h
+   
+
+~~~~~~~~~~~~~~default connection/auth -working, role/rolebinding not needed
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultConnection
+metadata:
+  name: default
+  namespace: openshift-operators
+spec:
+  address: 'https://vault-vault.apps-crc.testing'
+  skipTLSVerify: true
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: default
+  namespace: openshift-operators
+spec:
+  kubernetes:
+    role: secret-ocp-runner-vso
+    serviceAccount: default
+    tokenExpirationSeconds: 600
+  method: kubernetes
+  mount: kubernetes
+  vaultConnectionRef: default   
+  
+~~~~~~~~~~~~~~~~~~~~~~~~~~client/secret
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: app-secret
+  namespace: gitlab-qa
+spec:
+  destination:
+    create: true
+    name: my-secret
+    type: Opaque
+  mount: secret
+  path: ocp-runner/jvm/gitlab
+  refreshAfter: 30s
+  type: kv-v2  
