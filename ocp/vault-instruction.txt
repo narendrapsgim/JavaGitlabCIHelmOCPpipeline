@@ -1,4 +1,5 @@
 # kubernetes testing with secret ####################
+https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
 # use killerkoda
 k create secret generic my-secret --from-literal=password=123456
 
