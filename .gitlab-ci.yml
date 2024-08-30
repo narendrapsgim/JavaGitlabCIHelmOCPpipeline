@@ -94,7 +94,7 @@ scan-sonarqube: # check code with sonarqube cloud
     - | # run sonarqube scan
       gradle sonarqube
   rules:
-    - if: $RUN_SONARQUBE  
+    - if: $RUN_SONARQUBE == "true"  
 
 build-docker: # build docker image
   stage: build-docker
@@ -155,7 +155,7 @@ container_scanning:
     CS_REGISTRY_PASSWORD: $DOCKER_PASSWD
     GIT_STRATEGY: fetch
   rules:
-    - if: $RUN_IMAGE_SCANNING  
+    - if: $RUN_IMAGE_SCANNING == "true"  
 
 deploy-openshift: # deploy to openshift
   stage: deploy
