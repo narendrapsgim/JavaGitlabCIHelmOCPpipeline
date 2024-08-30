@@ -36,6 +36,8 @@ variables:
   TAG: 8-jre-alpine
   PORT: 8080
   HOSTNAME: jvm-$NAMESPACE.apps-crc.testing
+  RUN_SONARQUBE: "false"
+  RUN_IMAGE_SCANNING: "false"
 
 build-app: # build application
   variables:
@@ -91,6 +93,8 @@ scan-sonarqube: # check code with sonarqube cloud
       ./gradlew wrapper --gradle-version=8.5
     - | # run sonarqube scan
       gradle sonarqube
+  rules:
+    - if: $RUN_SONARQUBE  
 
 build-docker: # build docker image
   stage: build-docker
@@ -150,6 +154,8 @@ container_scanning:
     CS_REGISTRY_USER: $DOCKER_USER
     CS_REGISTRY_PASSWORD: $DOCKER_PASSWD
     GIT_STRATEGY: fetch
+  rules:
+    - if: $RUN_IMAGE_SCANNING  
 
 deploy-openshift: # deploy to openshift
   stage: deploy
