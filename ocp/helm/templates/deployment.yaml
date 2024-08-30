@@ -26,7 +26,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: my-secret
-                key: password    
+                key: my-secret    
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets }}
       
