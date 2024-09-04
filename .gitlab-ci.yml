@@ -10,7 +10,6 @@ stages:
   - deploy
 
 default:
-  environment: dev
   tags: ['uni-runner']  
   artifacts:
     paths:
