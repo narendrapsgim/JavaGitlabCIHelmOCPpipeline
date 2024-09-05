@@ -40,6 +40,7 @@ variables:
   RUN_IMAGE_SCANNING: "false"
 
 build-app: # build application
+  environment: dev
   variables:
     GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
   stage: build-app   
@@ -72,6 +73,7 @@ build-app: # build application
       if [[ "$GRADLE_EXT" == "" ]]; then echo "Cannot determine the file extension!" && exit 1; fi 
       
 scan-sonarqube: # check code with sonarqube cloud
+  environment: dev
   stage: test
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
@@ -97,6 +99,7 @@ scan-sonarqube: # check code with sonarqube cloud
     - if: $RUN_SONARQUBE == "true"  
 
 build-docker: # build docker image
+  environment: dev
   stage: build-docker
   image: docker.io/openshift/origin-cli:latest
   dependencies:
@@ -143,6 +146,7 @@ build-docker: # build docker image
       echo "GRADLE_NAME=$GRADLE_NAME" > variables.env       
   
 container_scanning:
+  environment: dev
   stage: scan-image  
   needs:
     - job: build-docker
@@ -158,6 +162,7 @@ container_scanning:
     - if: $RUN_IMAGE_SCANNING == "true"  
 
 deploy-openshift: # deploy to openshift
+  environment: dev
   stage: deploy
   image: $REGISTRY/alpine/helm:latest
   dependencies:
