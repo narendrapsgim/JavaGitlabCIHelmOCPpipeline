@@ -52,6 +52,10 @@ build-app: # build application
   script: 
     - | # run common scripts
       . ocp/scripts/sethome.sh
+      . ocp/scripts/s_replace.sh
+    - | # update gradle.properties
+      s_replace "xYOUR_GITLAB_TOKENx" "$YOUR_GITLAB_TOKEN" "gradle.properties"
+      cat gradle.properties  
     - | # build the app  
       echo "Starting to build project"
       export JAR_FOLDER=build/libs
