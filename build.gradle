@@ -4,6 +4,7 @@ plugins {
 	id 'org.springframework.boot' version '2.7.0'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id "org.sonarqube" version "4.4.1.3373"
+	id 'maven-publish'
 }
 
 group = 'com.jvm'
@@ -25,6 +26,28 @@ sonar {
     property "sonar.projectKey", "uniwinux1_java1"
     property "sonar.organization", "uniwinux1"
   }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java // Use this if you are publishing a Java project, adjust accordingly for other types.
+        }
+    }
+    
+    repositories {
+        maven {
+            name = "GitLab"
+            url = uri("https://gitlab.com/api/v4/projects/93042303/packages/maven")
+            credentials(HttpHeaderCredentials) {
+                name = "Private-Token"
+                value = findProperty("gitlabToken") ?: System.getenv("GITLAB_TOKEN")
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+        }
+    }
 }
 
 tasks.named('test') {
