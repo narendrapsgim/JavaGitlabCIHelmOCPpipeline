@@ -55,6 +55,8 @@ build-app: # build application
       . ocp/scripts/s_replace.sh
     - | # update gradle.properties
       s_replace "xYOUR_GITLAB_TOKENx" "$YOUR_GITLAB_TOKEN" "gradle.properties"
+      set -x
+      echo cattttttttttttttttttttttttttttttt
       cat gradle.properties  
     - | # build the app  
       echo "Starting to build project"
