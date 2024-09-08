@@ -41,7 +41,7 @@ publishing {
             url = uri("https://gitlab.com/api/v4/groups/uniwinux1/registry/-/packages/maven")
             credentials(HttpHeaderCredentials) {
                 name = "Private-Token"
-                value = findProperty("gitlabToken") ?: System.getenv("GITLAB_TOKEN")
+                value = gitlabToken
             }
             authentication {
                 header(HttpHeaderAuthentication)
