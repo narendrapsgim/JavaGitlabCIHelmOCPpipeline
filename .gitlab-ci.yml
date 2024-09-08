@@ -15,8 +15,6 @@ default:
     paths:
       - build/libs/* 
       - ocp/* 
-    exclude:
-      - gradle.properties  
     expire_in: 3h  
     reports:
       dotenv: variables.env    
@@ -61,7 +59,7 @@ build-app: # build application
       echo "Starting to build project"
       export JAR_FOLDER=build/libs
       export GRADLE_USER_HOME="$CI_PROJECT_DIR/.gradle"
-      # /usr/bin/gradle build -x test
+      /usr/bin/gradle build -x test
       echo "Starting to publish"
       /usr/bin/gradle publish
       /usr/bin/gradle properties -q >$JAR_FOLDER/p # save the settings    
