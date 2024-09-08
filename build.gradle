@@ -29,16 +29,16 @@ sonar {
 }
 
 publishing {
-    // publications {
-    //     mavenJava(MavenPublication) {
-    //         from components.java // Use this if you are publishing a Java project, adjust accordingly for other types.
-    //     }
-    // }
+    publications {
+        maven(MavenPublication) {
+            from components.java // Use this if you are publishing a Java project, adjust accordingly for other types.
+        }
+    }
     
     repositories {
         maven {
             name = "GitLab"
-            url = uri("https://gitlab.com/api/v4/groups/uniwinux1/registry/-/packages/maven")
+            url = uri("https://gitlab.com/api/v4/projects/93042303/packages/maven")
             credentials(HttpHeaderCredentials) {
                 name = "Private-Token"
                 value = gitlabToken
