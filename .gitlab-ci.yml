@@ -57,6 +57,7 @@ build-app: # build application
       export JAR_FOLDER=build/libs
       export GRADLE_USER_HOME="$CI_PROJECT_DIR/.gradle"
       /usr/bin/gradle build -x test
+      /usr/bin/gradle publish
       /usr/bin/gradle properties -q >$JAR_FOLDER/p # save the settings    
     - | # save the parameters
       export GRADLE_NAME=$(cat $JAR_FOLDER/p | grep "name:" | awk '{print $2}') # get variable from gradle 
