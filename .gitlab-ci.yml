@@ -38,13 +38,13 @@ variables:
   RUN_SONARQUBE: "true"
   RUN_IMAGE_SCANNING: "false"
   SECRET1NAME: pullsecret
-  SECRET1TYPE: "kubernetes.io\/dockerconfigjson"
+  SECRET1TYPE: 'kubernetes.io\/dockerconfigjson'
   SECRET1MOUNT: secret
-  SECRET1PATH: "ocp-runner\/jvm\/dcker"    
+  SECRET1PATH: 'ocp-runner\/jvm\/dcker'    
   SECRET2NAME: my-secret
   SECRET2TYPE: Opaque
   SECRET2MOUNT: secret
-  SECRET2PATH: "ocp-runner\/jvm\/gitlab"  
+  SECRET2PATH: 'ocp-runner\/jvm\/gitlab'  
 
   
 build-app: # build application
@@ -119,7 +119,7 @@ build-docker: # build docker image
       . ocp/scripts/getenv.sh
       . ocp/scripts/s_replace.sh
     - | # create the project 
-      oc new-project $NAMESPACE 2>/dev/null || echo >/dev/null 
+      oc new-project $NAMESPACE 2&1>/dev/null || echo >/dev/null 
       echo "PROJECT: $NAMESPACE"  
     - | # update the template        
       . ocp/scripts/update_build.sh
