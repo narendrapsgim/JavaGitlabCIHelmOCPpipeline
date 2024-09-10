@@ -8,7 +8,7 @@ for i in "${arr[@]}"
 do
     s_replace "xNAMESPACEx" "$NAMESPACE" "$i"
     s_replace "xNAMEx" "$GRADLE_NAME" "$i"
-    s_replace "xPULLSECRETx" "$PULLSECRET" "$i"
+    s_replace "xPULLSECRETx" "$SECRET1NAME" "$i"
     s_replace "xCHARTVERSIONx" "$CHARTVERSION" "$i"
     s_replace "xAPPVERSIONx" "latest" "$i"
     s_replace "xGRADLE_BINx" "$GRADLE_NAME-$GRADLE_VERSION.$GRADLE_EXT" "$i"

@@ -28,7 +28,6 @@ variables:
   GITLAB_AGENT: uniwinux1/agentr:agentr
   DOCKER_USER: uniwinux
   CHARTVERSION: 1.0.0
-  PULLSECRET: pullsecret
   TIMEZONEREGION: America
   TIMEZONECITY: Toronto
   REGISTRY: docker.io
@@ -119,16 +118,14 @@ build-docker: # build docker image
       . ocp/scripts/setcontext.sh
       . ocp/scripts/getenv.sh
       . ocp/scripts/s_replace.sh
-    - | # create the dockerconfig, project 
+    - | # create the project 
       oc new-project $NAMESPACE 2>/dev/null || echo >/dev/null 
       echo "PROJECT: $NAMESPACE"  
-      oc create secret docker-registry $PULLSECRET --docker-server=$REGISTRY \
-        --docker-username=$DOCKER_USER \
-        --docker-password=$DOCKER_PASSWD \
-        --docker-email="" -n $NAMESPACE 2>/dev/null || echo >/dev/null
-        echo "PULLSECRET: $PULLSECRET"
     - | # update the template        
       . ocp/scripts/update_build.sh
+    - | # execute vault
+      oc apply -f ocp/build/vault.yaml 
+      echo "Vault Docker Secret Created"
     - | # copy the bin   
       cp $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.$GRADLE_EXT ocp/build
     - | # change directory so that build will have only necessary files  
@@ -140,9 +137,7 @@ build-docker: # build docker image
       # check combined file
       cat buildconfig.yaml
       # check the current folder
-      ls -la
-    - | # execute vault
-      oc apply -f vault.yaml  
+      ls -la 
     - | # execute the buildconfig  
       # buildconfig always failed on the first
       oc apply -f buildconfig.yaml --recursive --wait 2>/dev/null || echo >/dev/null
