@@ -116,7 +116,7 @@ build-docker: # build docker image
       . ocp/scripts/getenv.sh
       . ocp/scripts/s_replace.sh
     - | # create the project 
-      oc new-project $NAMESPACE 2&1>/dev/null || echo >/dev/null 
+      oc new-project $NAMESPACE 2>&1 /dev/null || echo >/dev/null 
       echo "PROJECT: $NAMESPACE"  
     - | # update the template        
       . ocp/scripts/update_build.sh
