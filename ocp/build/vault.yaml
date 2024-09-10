@@ -1,0 +1,14 @@
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: {{ .Values.vault.secret1.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  destination:
+    create: true
+    name: {{ .Values.vault.secret1.name }}
+    type: {{ .Values.vault.secret1.type }}
+  mount: {{ .Values.vault.secret1.mount }}
+  path: {{ .Values.vault.secret1.path }}
+  refreshAfter: 30s
+  type: kv-v2 

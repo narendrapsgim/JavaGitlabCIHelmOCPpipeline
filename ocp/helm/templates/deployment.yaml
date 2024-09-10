@@ -22,11 +22,11 @@ spec:
           image: "{{ .Values.image.registry }}/{{ .Values.image.user }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-          - name: MY-SECRET
+          - name: {{ .Values.vault.secret1.name | upper }}
             valueFrom:
               secretKeyRef:
-                name: my-secret
-                key: my-secret    
+                name: {{ .Values.vault.secret1.name }}
+                key: {{ .Values.vault.secret1.name }}  
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets }}
       
