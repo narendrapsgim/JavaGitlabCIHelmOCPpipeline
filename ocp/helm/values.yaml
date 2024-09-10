@@ -27,6 +27,4 @@ route:
 vault:  
   secret2:
     name: xSECRET2NAMEx
-    type: xSECRET2TYPEx
     mount: xSECRET2MOUNTx
-    path: xSECRET2PATHx   

@@ -7,8 +7,8 @@ spec:
   destination:
     create: true
     name: xSECRET1NAMEx
-    type: xSECRET1TYPEx
+    type: 'kubernetes.io/dockerconfigjson'
   mount: xSECRET1MOUNTx
-  path: xSECRET1PATHx
+  path: 'ocp-runner/jvm/docker'
   refreshAfter: 30s
   type: kv-v2 

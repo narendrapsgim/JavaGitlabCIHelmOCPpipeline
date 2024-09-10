@@ -18,8 +18,6 @@ do
     s_replace 'xDOCKER_USERx' '$DOCKER_USER' '$i'      
     s_replace 'xPORTx' '$PORT' '$i' 
     s_replace 'xHOSTNAMEx' '$HOSTNAME' '$i'
-    s_replace 'xSECRET2NAMEx' '$SECRET2NAME' '$i'
-    s_replace 'xSECRET2TYPEx' '$SECRET2TYPE' '$i'
-    s_replace 'xSECRET2MOUNTx' '$SECRET2MOUNT' '$i'
-    s_replace 'xSECRET2PATHx' '$SECRET2PATH' '$i'
+    s_replace 'xSECRET1NAMEx' '$SECRET1NAME' '$i'
+    s_replace 'xSECRET1MOUNTx' '$SECRET1MOUNT' '$i'
 done
