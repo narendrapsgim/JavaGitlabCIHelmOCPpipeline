@@ -42,7 +42,9 @@ variables:
   SECRET1MOUNT: secret
   SECRET1PATH: 'ocp-runner\/jvm\/docker'
   SECRET2NAME: my-secret
+  SECRET2TYPE: Opaque
   SECRET2MOUNT: secret
+  SECRET2PATH: 'ocp-runner\/jvm\/docker'
   
 build-app: # build application
   environment: dev
@@ -121,10 +123,9 @@ build-docker: # build docker image
     - | # update the template        
       . ocp/scripts/update_build.sh
     - | # execute vault
-      cat ocp/build/vault.yaml # debug
+      cat ocp/build/vault.yaml 
       oc apply -f ocp/build/vault.yaml 
       echo "Vault Docker Secret Created"
-      xxxxxxxxxxxx
     - | # copy the bin   
       cp $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.$GRADLE_EXT ocp/build
     - | # change directory so that build will have only necessary files  

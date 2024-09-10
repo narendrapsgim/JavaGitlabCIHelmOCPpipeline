@@ -7,9 +7,9 @@ spec:
   destination:
     create: true
     name: {{ .Values.vault.secret2.name }}
-    type: Opaque
+    type: {{ .Values.vault.secret2.type }}
   mount: {{ .Values.vault.secret2.mount }}
-  path: 'ocp-runner/jvm/gitlab'
+  path: {{ .Values.vault.secret2.path }}
   refreshAfter: 30s
   type: kv-v2  
   

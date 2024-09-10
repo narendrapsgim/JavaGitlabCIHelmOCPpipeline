@@ -1,7 +1,3 @@
-# Default values for helm.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 replicaCount: 1
 
 image:
@@ -25,6 +21,10 @@ route:
   hostname: "xHOSTNAMEx"  
 
 vault:  
+  secret1:
+    name: xSECRET1NAMEx
   secret2:
     name: xSECRET2NAMEx
+    type: xSECRET2TYPEx
     mount: xSECRET2MOUNTx
+    path: xSECRET2PATHx
