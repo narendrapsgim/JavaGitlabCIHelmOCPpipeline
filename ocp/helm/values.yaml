@@ -21,8 +21,6 @@ route:
   hostname: "xHOSTNAMEx"  
 
 vault:  
-  secret1:
-    name: xSECRET1NAMEx
   secret2:
     name: xSECRET2NAMEx
     type: xSECRET2TYPEx
