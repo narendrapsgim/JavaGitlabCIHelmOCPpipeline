@@ -40,6 +40,7 @@ variables:
   SECRET1NAME: pullsecret
   SECRET1TYPE: 'kubernetes.io\/dockerconfigjson'
   SECRET1MOUNT: secret
+  SECRET1PATH: 'ocp-runner\/jvm\/docker'
   SECRET2NAME: my-secret
   SECRET2MOUNT: secret
   
@@ -121,9 +122,9 @@ build-docker: # build docker image
       . ocp/scripts/update_build.sh
     - | # execute vault
       cat ocp/build/vault.yaml # debug
-      xxxxxxxxxxxx
       oc apply -f ocp/build/vault.yaml 
       echo "Vault Docker Secret Created"
+      xxxxxxxxxxxx
     - | # copy the bin   
       cp $JAR_FOLDER/$GRADLE_NAME-$GRADLE_VERSION.$GRADLE_EXT ocp/build
     - | # change directory so that build will have only necessary files  
