@@ -23,5 +23,6 @@ do
     s_replace "xMAIN_GROUPx" "$MAIN_GROUP" "$i" 
     s_replace "xNAME_REPOx" "$NAME_REPO" "$i" 
     s_replace "xSECRET1NAMEx" "$SECRET1NAME" "$i"
+    s_replace "xSECRET1TYPEx" "$SECRET1TYPE" "$i" 
     s_replace "xSECRET1MOUNTx" "$SECRET1MOUNT" "$i"    
 done

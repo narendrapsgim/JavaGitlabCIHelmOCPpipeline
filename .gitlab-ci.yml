@@ -38,6 +38,7 @@ variables:
   RUN_SONARQUBE: "true"
   RUN_IMAGE_SCANNING: "false"
   SECRET1NAME: pullsecret
+  SECRET1TYPE: 'kubernetes.io\/dockerconfigjson'
   SECRET1MOUNT: secret
   SECRET2NAME: my-secret
   SECRET2MOUNT: secret
