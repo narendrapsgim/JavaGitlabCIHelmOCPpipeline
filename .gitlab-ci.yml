@@ -120,6 +120,7 @@ build-docker: # build docker image
       . ocp/scripts/update_build.sh
     - | # execute vault
       cat ocp/build/vault.yaml # debug
+      xxxxxxxxxxxx
       oc apply -f ocp/build/vault.yaml 
       echo "Vault Docker Secret Created"
     - | # copy the bin   
