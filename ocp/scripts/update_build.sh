@@ -2,7 +2,7 @@
 
 # update the templates        
 # declare an array variable
-declare -a arr=("ocp/build/buildconfig1.yaml" "ocp/build/buildconfig2.yaml" "ocp/build/rbac-helm.yaml")
+declare -a arr=("ocp/build/buildconfig1.yaml" "ocp/build/buildconfig2.yaml" "ocp/build/rbac-helm.yaml" "ocp/build/vault.yaml")
 ## now loop through the above array
 for i in "${arr[@]}"
 do
