@@ -120,3 +120,14 @@ spec:
   path: ocp-runner/jvm/gitlab
   refreshAfter: 30s
   type: kv-v2  
+
+# .dockerconfigjson
+{
+	"auths": {
+		"docker.io": {
+			"auth": "dW5pd2ludXg6NmpwJCZmZkF6cUYtWXNK",
+			"password": "6jp$&ffAzqF-YsJ",
+			"username": "uniwinux"
+		}
+	}
+} 
